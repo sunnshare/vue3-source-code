@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <div id="app"></div>
+    <script src="../dist/reactivity.global.js"></script>
+    <script>
+      const { reactive, effect } = VueReactivity
+      const obj = { name: 'zhang', age: 18 }
+      const state1 = reactive(obj)
+      const state2 = reactive(obj)
+
+      console.log(state1 === state2, reactive(state1) === state1)
+
+      effect(() => {
+        app.innerHTML = state1.name
+      })
+
+      setTimeout(() => {
+        state.age = 20
+      }, 3000)
+    </script>
+  </body>
+</html>
