@@ -11,18 +11,28 @@
     <script src="../dist/reactivity.global.js"></script>
     <script>
       const { reactive, effect } = VueReactivity
-      const obj = { name: 'zhang', age: 18 }
+      const obj = { name: 'zhang', age: 18, three: '3' }
       const state1 = reactive(obj)
       const state2 = reactive(obj)
 
       console.log(state1 === state2, reactive(state1) === state1)
 
       effect(() => {
-        app.innerHTML = state1.name
+        app.innerHTML = state1.age
+        effect(() => {
+          app.innerHTML = state1.name
+        })
+        app.innerHTML = state1.three
+      })
+
+      app.innerHTML = state1.age
+
+      effect(() => {
+        state1.age = Math.random()
       })
 
       setTimeout(() => {
-        state.age = 20
+        state1.age = 20
       }, 3000)
     </script>
   </body>

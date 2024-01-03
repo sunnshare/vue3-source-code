@@ -24,3 +24,10 @@
 - 防止嵌套代理：\_\_v_isReadonly 用来标识已被代理，get 方法时直接返回 true
 - 代理同一对象返回相同结果：使用一个 WeakMap 来构建对象与代理对象的映射，已被代理的对象直接返回代理的结果
 - weakMap key 必须是对象，如果 key 没有被引用就可以被自动回收
+
+## 实现 effect
+
+- track 实现
+  - 调用 effect 时，创建 ReactiveEffect 类，调用 run 方法
+  - 收集 effect，指针指向当前 effect，再执行函数，effect 执行完毕之后，effect 出栈，改变指针指向
+  - effect 内属性取值时，调用 track 方法，构建一个 {target:map{key:set[activeEffect]}} WeakMap 收集 activeEffect

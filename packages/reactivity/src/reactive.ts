@@ -1,5 +1,6 @@
 import { isObject } from '@vue/shared'
 import { ReactiveFlags } from './constants'
+import { track } from './effect'
 
 interface Target {
   [ReactiveFlags.SKIP]?: boolean
@@ -14,6 +15,7 @@ const mutableHandlers: ProxyHandler<Record<any, any>> = {
     if (key === ReactiveFlags.IS_REACTIVE) {
       return true
     }
+    track(target, key)
     const res = Reflect.get(target, key, recevier) // target[key]
     return res
   },

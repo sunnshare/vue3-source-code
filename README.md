@@ -12,3 +12,5 @@ vue2 源码请看 https://github.com/sunnshare/vue-source-code/
 - [proxy 语法介绍](./others/Proxy.md)——[详细介绍地址](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
 
 - [Reflect 语法介绍](./others/Reflect.md)——[详细介绍地址](https://es6.ruanyifeng.com/#docs/reflect)
+
+- [Record 工具类型](./others/Record.md)——[详细介绍地址](https://ts.yayujs.com/reference/UtilityTypes.html#record-keys-type)
