@@ -6,6 +6,7 @@ vue2 源码请看 https://github.com/sunnshare/vue-source-code/
 
 - [x] monorepo 环境搭建
 - [x] 实现 reactive
+- [x] 实现响应式原理
 
 ### 其他笔记
 
