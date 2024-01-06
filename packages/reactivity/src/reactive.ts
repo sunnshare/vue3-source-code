@@ -1,7 +1,6 @@
 import { isObject } from '@vue/shared'
 import { ReactiveFlags } from './constants'
-import { track, trigger } from './effect'
-
+import { track, trigger } from './reactiveEffect'
 interface Target {
   [ReactiveFlags.SKIP]?: boolean
   [ReactiveFlags.IS_REACTIVE]?: boolean
