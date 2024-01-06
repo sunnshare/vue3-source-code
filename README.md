@@ -8,6 +8,7 @@ vue2 源码请看 https://github.com/sunnshare/vue-source-code/
 - [x] 实现 reactive
 - [x] 实现响应式原理
 - [x] 实现计算属性
+- [x] 实现 ref
 
 ### 其他笔记
 

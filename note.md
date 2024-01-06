@@ -54,3 +54,9 @@
 
 - 计算属性依赖的值变化了(此时 中还有)，执行依赖值的 set 方法，触发 trigger，从 targetMap 中取出来对应的 dep 依次执行
 - 如果该 effect 有 scheduler 方法说明是计算属性，则执行 scheduler() 方法，设置 \_dirty = true
+
+## ref 实现
+
+- 创建 RefImpl 的实例，记录原始的值，是对象用 reactive 包裹,否则返回本身
+
+- 取值时触发 trackEffect，设置值时触发 triggerEffects

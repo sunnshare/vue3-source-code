@@ -64,7 +64,7 @@ export function track(target: object, key: unknown) {
   }
   let dep = depsMap.get(key)
   if (!dep) {
-    depsMap.set(key, (dep = createMap(() => {}))) // {target:map{key:set[]}}
+    depsMap.set(key, (dep = createMap(() => depsMap!.delete(key)))) // {target:map{key:set[]}}
   }
   trackEffect(activeEffect, dep)
 }

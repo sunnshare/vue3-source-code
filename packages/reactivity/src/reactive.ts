@@ -32,6 +32,13 @@ export function reactive(target: Target) {
   return createReactiveObject(target)
 }
 
+export const toReactive = <T>(value: T): T =>
+  isObject(value) ? reactive(value) : value
+
+export function toRaw<T>(observed: T): T {
+  const raw = observed && (observed as Target)[ReactiveFlags.RAW]
+  return raw ? toRaw(raw) : observed
+}
 // export function readonly() {}
 // export function shallowReactive() {}
 // export function shallowReadonly() {}
