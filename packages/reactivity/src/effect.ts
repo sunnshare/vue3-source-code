@@ -12,5 +12,6 @@ export function effect<T = any>(fn: () => T) {
   let runner = _effect.run.bind(_effect) as ReactiveEffectRunner
 
   runner.effect = _effect
+  // 返回一个函数和属性 effect
   return runner
 }

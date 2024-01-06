@@ -11,16 +11,28 @@
     <script src="../dist/reactivity.global.js"></script>
     <script>
       const { reactive, effect, computed } = VueReactivity
-      const obj = reactive({ name: 'zhang', age: 18 })
+      const obj = { name: 'zhang', age: 18 }
+      const state = reactive(obj)
+      // this.effect 记录一个更新的回调 scheduler
       const plusAge = computed({
         get() {
           console.log('get')
-          return obj.age + 1
+          return state.age + 1
         },
         set(value) {
           console.log('value', value)
         },
       })
+      effect(() => {
+        // _dirty = false，缓存 _value，targetMap 记录 effect
+        console.log(plusAge.value)
+        console.log(plusAge.value)
+        console.log(plusAge.value)
+      })
+      plusAge.value = 12
+      setTimeout(() => {
+        state.age = 20
+      }, 2000)
     </script>
   </body>
 </html>
