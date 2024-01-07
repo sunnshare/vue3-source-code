@@ -6,11 +6,9 @@
     <title>Document</title>
   </head>
   <body>
+    <div id="app">123</div>
     <script src="../dist/runtime-dom.global.js"></script>
     <script>
-      console.log(VueRuntimeDom)
-    </script>
-    <!-- <script>
       let { createApp, h, ref } = VueRuntimeDom
 
       function useCount(initValue) {
@@ -24,7 +22,10 @@
         }
       }
 
-      let app = {
+      let App = {
+        props: {
+          title: {},
+        },
         // setup() {
         //   let { count, add } = useCount(0)
         //   return () => {
@@ -42,6 +43,8 @@
           return h('h1', { onClick: this.add }, 'hello runtime' + this.count)
         },
       }
-    </script> -->
+      let app = createApp(App, { title: 'title' })
+      app.mount('#app')
+    </script>
   </body>
 </html>

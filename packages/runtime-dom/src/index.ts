@@ -1,6 +1,22 @@
+import { CreateAppFunction, createRenderer } from '@vue/runtime-core'
 import { nodeOps } from './nodeOps'
 import { patchProp } from './patchProps'
 
 const renderOptions = Object.assign(nodeOps, { patchProp })
 
-console.log(renderOptions)
+export const createApp: CreateAppFunction<Element> = (
+  component,
+  rootProps = null
+) => {
+  const { createApp } = createRenderer(renderOptions)
+  let app = createApp(component, rootProps)
+  let { mount } = app
+  app.mount = function (rootContainer: string) {
+    const container = nodeOps.querySelector(rootContainer)
+    if (container) {
+      container.innerHTML = ''
+      mount(container)
+    }
+  }
+  return app
+}

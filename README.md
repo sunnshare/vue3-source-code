@@ -21,3 +21,5 @@ vue2 源码请看 https://github.com/sunnshare/vue-source-code/
 - [is 类型谓词](./others/is.md)——[详细介绍地址](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates)
 
 - [Omit 工具类型](./others/Omit.md)——[详细介绍地址](https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys)
+
+- [二进制权限控制](./others/二进制权限控制.md)——[位运算介绍地址](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Expressions_and_operators#%E4%BD%8D%E8%BF%90%E7%AE%97%E7%AC%A6)
