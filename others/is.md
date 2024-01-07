@@ -7,28 +7,24 @@
 如果谓词返回 true，TypeScript 编译器会将变量类型缩小为 TargetType。
 如果返回 false，则变量仍然是原来的类型。
 
-```
+```ts
 interface Animal {
-  name: string;
+  name: string
 }
-​
 interface Cat extends Animal {
-  purr: () => void;
+  purr: () => void
 }
-​
 interface Dog extends Animal {
-  bark: () => void;
+  bark: () => void
 }
-​
 function isCat(animal: Animal): animal is Cat {
-  return (animal as Cat).purr !== undefined;
+  return (animal as Cat).purr !== undefined
 }
-​
 function makeSound(animal: Animal) {
   if (isCat(animal)) {
-    animal.purr();
+    animal.purr()
   } else {
-    animal.bark();
+    animal.bark()
   }
 }
 ```

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <script src="../dist/runtime-dom.global.js"></script>
+    <script>
+      console.log(VueRuntimeDom)
+    </script>
+    <!-- <script>
+      let { createApp, h, ref } = VueRuntimeDom
+
+      function useCount(initValue) {
+        const count = ref(initValue)
+        const add = () => {
+          count.value++
+        }
+        return {
+          count,
+          add,
+        }
+      }
+
+      let app = {
+        // setup() {
+        //   let { count, add } = useCount(0)
+        //   return () => {
+        //     return h('h1', { onClick: add }, 'hello runtime' + count.value)
+        //   }
+        // },
+        setup() {
+          let { count, add } = useCount(0)
+          return {
+            count,
+            add,
+          }
+        },
+        render(proxy) {
+          return h('h1', { onClick: this.add }, 'hello runtime' + this.count)
+        },
+      }
+    </script> -->
+  </body>
+</html>

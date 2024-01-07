@@ -18,4 +18,6 @@ vue2 源码请看 https://github.com/sunnshare/vue-source-code/
 
 - [Record 工具类型](./others/Record.md)——[详细介绍地址](https://ts.yayujs.com/reference/UtilityTypes.html#record-keys-type)
 
-- [is 类型谓词](./others/is.md)-[详细介绍地址](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates)
+- [is 类型谓词](./others/is.md)——[详细介绍地址](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#using-type-predicates)
+
+- [Omit 工具类型](./others/Omit.md)——[详细介绍地址](https://www.typescriptlang.org/docs/handbook/utility-types.html#omittype-keys)

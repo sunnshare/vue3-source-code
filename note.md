@@ -14,8 +14,7 @@
 - private:true 防止 npm publish
 - execa 开启进程 - 并行打包
 
-- 将 shared 文件与 reactivity 软连接 pnpm install @vue/shared
-  @workspace --filter @vue/reactivity
+- 将 shared 文件与 reactivity 软连接 pnpm install @vue/shared @workspace --filter @vue/reactivity
 
 - npm run dev => node scripts/dev.js -s => rollup -cw --environment xxx => rollup.config.js
 

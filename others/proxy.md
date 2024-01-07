@@ -4,7 +4,7 @@ Proxy 对象用于创建一个对象的代理，从而实现基本操作的拦�
 
 ## 语法
 
-```
+```js
 const p = new Proxy(target, handler)
 ```
 
@@ -20,38 +20,38 @@ const p = new Proxy(target, handler)
 
 1. handler.get(target, property, receiver) 方法用于拦截对象的读取属性操作。
 
-```
+```js
 var p = new Proxy(
   {},
   {
     get: function (target, prop, receiver) {
-      console.log("called: " + prop);
-      return 10;
+      console.log('called: ' + prop)
+      return 10
     },
-  },
-);
-console.log(p.a); // "called: a"; ouptut 10
+  }
+)
+console.log(p.a) // "called: a"; ouptut 10
 ```
 
 2. handler.set(target, property, value, receiver) 方法是设置属性值操作的捕获器。
 
-```
+```js
 var p = new Proxy(
   {},
   {
     set: function (target, prop, value, receiver) {
-      target[prop] = value;
-      console.log("property set: " + prop + " = " + value);
-      return true;
+      target[prop] = value
+      console.log('property set: ' + prop + ' = ' + value)
+      return true
     },
-  },
-);
+  }
+)
 
-console.log("a" in p); // false
+console.log('a' in p) // false
 
-p.a = 10; // "property set: a = 10"
-console.log("a" in p); // true
-console.log(p.a); // 10
+p.a = 10 // "property set: a = 10"
+console.log('a' in p) // true
+console.log(p.a) // 10
 ```
 
 3. others 共 13 种
