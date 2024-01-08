@@ -1,6 +1,8 @@
-import { CreateAppFunction, createRenderer } from '@vue/runtime-core'
+export * from '@vue/reactivity'
+import { createRenderer } from '@vue/runtime-core'
 import { nodeOps } from './nodeOps'
 import { patchProp } from './patchProps'
+import { CreateAppFunction } from 'packages/runtime-core/src/apiCreateApp'
 
 const renderOptions = Object.assign(nodeOps, { patchProp })
 

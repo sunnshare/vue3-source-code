@@ -32,7 +32,8 @@
         //     return h('h1', { onClick: add }, 'hello runtime' + count.value)
         //   }
         // },
-        setup() {
+        setup(props, ctx) {
+          console.log(props, ctx)
           let { count, add } = useCount(0)
           return {
             count,
@@ -43,7 +44,7 @@
           return h('h1', { onClick: this.add }, 'hello runtime' + this.count)
         },
       }
-      let app = createApp(App, { title: 'title' })
+      let app = createApp(App, { title: 'title', a: 1 })
       app.mount('#app')
     </script>
   </body>

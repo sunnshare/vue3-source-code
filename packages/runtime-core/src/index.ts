@@ -1,10 +1,3 @@
-export * from '@vue/reactivity'
-
-export type {
-  RendererNode,
-  RendererElement,
-  RendererOptions,
-  CreateAppFunction,
-} from './renderer'
+export type { RendererNode, RendererElement, RendererOptions } from './renderer'
 
 export { createRenderer } from './renderer'

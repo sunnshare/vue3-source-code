@@ -1,6 +1,7 @@
 import { ShapeFlags } from '@vue/shared'
-import { createAppAPI } from './apiCreateApp'
+import { CreateAppFunction, createAppAPI } from './apiCreateApp'
 import { VNode } from './vnode'
+import { createComponentInstance, setupComponent } from './component'
 
 export interface RendererNode {
   [key: string]: any
@@ -29,19 +30,6 @@ export interface RendererOptions<
   querySelector(selector: string): HostElement | null
 }
 
-export type Component = Record<any, any>
-
-export type CreateAppFunction<HostElement> = (
-  rootComponent: Component,
-  rootProps: Data | null
-) => App<HostElement>
-
-interface App<HostElement = any> {
-  mount(rootContainer: HostElement | string): any
-}
-
-export type Data = Record<string, unknown>
-
 interface Renderer<HostElement = RendererElement> {
   render: RootRenderFunction<HostElement>
   createApp: CreateAppFunction<HostElement>
@@ -49,6 +37,12 @@ interface Renderer<HostElement = RendererElement> {
 
 type MountComponentFn = (
   initialVNode: VNode,
+  container: RendererElement
+) => void
+
+type PatchFn = (
+  n1: VNode | null, // null means this is a mount
+  n2: VNode,
   container: RendererElement
 ) => void
 
@@ -61,12 +55,6 @@ export function createRenderer<
   return baseCreateRenderer(options)
 }
 
-type PatchFn = (
-  n1: VNode | null, // null means this is a mount
-  n2: VNode,
-  container: RendererElement
-) => void
-
 function baseCreateRenderer<
   HostNode = RendererNode,
   HostElement = RendererElement
@@ -77,13 +65,17 @@ function baseCreateRenderer(options: RendererOptions): any {
 
   const mountComponent: MountComponentFn = (initialVNode, container) => {
     // 根据组件的虚拟节点 创造一个真实节点
+    // 给组件创造一个组件的实例
+    const instance = createComponentInstance(initialVNode)
+
+    // 给组件的实例进行赋值操作
+    setupComponent(instance)
   }
   const processComponent = (
     n1: VNode | null,
     n2: VNode,
     container: RendererElement
   ) => {
-    debugger
     if (n1 == null) {
       mountComponent(n2, container)
     } else {

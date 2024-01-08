@@ -1,5 +1,15 @@
-import { CreateAppFunction, RootRenderFunction } from './renderer'
+import { Component, Data } from './component'
+import { RootRenderFunction } from './renderer'
 import { createVNode } from './vnode'
+
+interface App<HostElement = any> {
+  mount(rootContainer: HostElement | string): any
+}
+
+export type CreateAppFunction<HostElement> = (
+  rootComponent: Component,
+  rootProps: Data | null
+) => App<HostElement>
 
 export function createAppAPI<HostElement>(
   render: RootRenderFunction<HostElement>
