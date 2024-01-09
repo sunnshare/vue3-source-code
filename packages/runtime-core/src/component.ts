@@ -1,7 +1,10 @@
-import { ComponentPublicInstance } from './ComponentPublicInstance'
+import {
+  ComponentPublicInstance,
+  PublicInstanceProxyHandler,
+} from './ComponentPublicInstance'
 import { EmitFn, EmitsOptions, UnwrapSlotsType } from './componentEmits'
 import { InternalSlots, SlotsType } from './componentSlots'
-import { VNode } from './vnode'
+import { VNode, VNodeChild } from './vnode'
 import { initProps } from './componentProps'
 import { isFunction, isObject } from '@vue/shared'
 
@@ -15,7 +18,9 @@ type ConcreteComponent<Props = {}> = {
   render: () => void
 }
 
-type InternalRenderFunction = {}
+type InternalRenderFunction = {
+  [x: string]: any
+}
 
 export interface ComponentInternalInstance {
   /**
@@ -85,6 +90,8 @@ function setupStatefulComponent(instance: ComponentInternalInstance) {
   // 核心：调用组件的setup方法
   const Component = instance.type
   const { setup } = Component
+  instance.proxy = new Proxy(instance.ctx, PublicInstanceProxyHandler) // proxy是代理的上下文
+
   if (setup) {
     const setupContext = createSetupContext(instance)
     let setupResult = setup(instance.props, setupContext)
@@ -95,10 +102,10 @@ function setupStatefulComponent(instance: ComponentInternalInstance) {
       instance.setupState = setupResult
     }
   }
+
   if (!instance.render) {
     instance.render = Component.render
   }
-  console.log(instance)
 }
 
 function createSetupContext(instance: ComponentInternalInstance): SetupContext {

@@ -20,6 +20,8 @@ type VNodeChildAtom =
 
 type VNodeArrayChildren = Array<VNodeArrayChildren | VNodeChildAtom>
 
+export type VNodeChild = VNodeChildAtom | VNodeArrayChildren
+
 type VNodeNormalizedChildren = string | VNodeArrayChildren | null
 
 export interface VNode<HostNode = RendererNode> {
@@ -31,6 +33,10 @@ export interface VNode<HostNode = RendererNode> {
   component: ComponentInternalInstance | null
   el: HostNode | null
   shapeFlag: number
+}
+
+export function isVNode(value: any): value is VNode {
+  return value ? value.__v_isVNode === true : false
 }
 
 const normalizeKey = ({ key }: VNodeProps): VNode['key'] =>

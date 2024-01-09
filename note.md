@@ -60,4 +60,10 @@
 
 - 取值时触发 trackEffect，设置值时触发 triggerEffects
 
-##
+## createApp 方法实现
+
+- 调用 createRenderer 传入 dom 操作的 api 和更新 props 的方法，返回一个被各种方法包裹的 render 函数
+
+## h 方法实现
+
+- 使用 typescript 函数重载适配不同的传入参数，最终调用了 createVNode 创造一个虚拟节点

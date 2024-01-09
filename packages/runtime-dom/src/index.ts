@@ -1,4 +1,5 @@
 export * from '@vue/reactivity'
+export * from '@vue/runtime-core'
 import { createRenderer } from '@vue/runtime-core'
 import { nodeOps } from './nodeOps'
 import { patchProp } from './patchProps'
