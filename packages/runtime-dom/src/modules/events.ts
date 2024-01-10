@@ -1,3 +1,5 @@
+import { isArray } from '@vue/shared'
+
 type EventValue = Function | Function[]
 
 interface Invoker extends EventListener {
@@ -32,7 +34,7 @@ export function patchEvent(
 
 function createInvoker(initialValue: EventValue) {
   const invoker: Invoker = e => {
-    if (Array.isArray(invoker.value)) {
+    if (isArray(invoker.value)) {
       invoker.value.map(fn => fn(e))
     } else {
       invoker.value(e)

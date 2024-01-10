@@ -60,10 +60,30 @@
 
 - 取值时触发 trackEffect，设置值时触发 triggerEffects
 
-## createApp 方法实现
+## render 函数实现
 
-- 调用 createRenderer 传入 dom 操作的 api 和更新 props 的方法，返回一个被各种方法包裹的 render 函数
+- createApp 方法实现
 
-## h 方法实现
+  - 调用 createRenderer 传入 dom 操作的 api 和更新 props 的方法，返回一个被各种方法包裹的 render 函数
 
-- 使用 typescript 函数重载适配不同的传入参数，最终调用了 createVNode 创造一个虚拟节点
+- h 方法实现
+
+  - 使用 typescript 函数重载适配不同的传入参数，最终调用了 createVNode 创造一个虚拟节点
+
+- 调用 render 函数，有虚拟节点时，会调用 patch 更新节点，根据不同类型处理不同的节点
+
+- 文本节点的处理方式：调用传入的 Dom api 创建文本节点，挂载到容器上
+
+- 组件的处理方式
+
+  - createComponentInstance 创建组件虚拟节点
+  - setupComponent 给组件赋值，初始化 props,attrs,ctx,proxy,render,emit,expose 等
+  - 创建组件 effect(使用 ReactiveEffect，传入 componentUpdateFn)，数据变化时触发 componentUpdateFn 函数，进行组件的更新 patch
+
+- 元素节点处理方式
+
+  - 是文本节点就创建文本元素
+  - 是数组子元素，就递归使用 patch 方法进行处理
+  - 是属性就调用传入的 patchProp 方法进行处理
+
+- 最后将处理好的节点挂载到容器上

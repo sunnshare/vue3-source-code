@@ -1,6 +1,6 @@
 import { ShapeFlags } from '@vue/shared'
 import { CreateAppFunction, createAppAPI } from './apiCreateApp'
-import { VNode } from './vnode'
+import { Text, VNode, VNodeArrayChildren, normalizeVNode } from './vnode'
 import {
   ComponentInternalInstance,
   createComponentInstance,
@@ -51,6 +51,23 @@ type PatchFn = (
   container: RendererElement
 ) => void
 
+type MountChildrenFn = (
+  children: VNodeArrayChildren,
+  container: RendererElement
+) => void
+
+type ProcessTextOrCommentFn = (
+  n1: VNode | null,
+  n2: VNode,
+  container: RendererElement
+) => void
+
+type SetupRenderEffectFn = (
+  instance: ComponentInternalInstance,
+  initialVNode: VNode,
+  container: RendererElement
+) => void
+
 export function createRenderer<
   HostNode = RendererNode,
   HostElement = RendererElement
@@ -60,12 +77,6 @@ export function createRenderer<
   return baseCreateRenderer(options)
 }
 
-type SetupRenderEffectFn = (
-  instance: ComponentInternalInstance,
-  initialVNode: VNode,
-  container: RendererElement
-) => void
-
 function baseCreateRenderer<
   HostNode = RendererNode,
   HostElement = RendererElement
@@ -73,6 +84,18 @@ function baseCreateRenderer<
 
 function baseCreateRenderer(options: RendererOptions): any {
   // 将虚拟节点转换成真实节点渲染到容器中
+
+  const {
+    insert: hostInsert,
+    remove: hostRemove,
+    patchProp: hostPatchProp,
+    createElement: hostCreateElement,
+    createText: hostCreateText,
+    setText: hostSetText,
+    setElementText: hostSetElementText,
+    parentNode: hostParentNode,
+    nextSibling: hostNextSibling,
+  } = options
 
   const setupRenderEffect: SetupRenderEffectFn = (
     instance,
@@ -89,8 +112,10 @@ function baseCreateRenderer(options: RendererOptions): any {
             proxy,
             proxy
           ))
+          patch(null, subTree, container)
+          initialVNode.el = subTree.el
+          instance.isMounted = true
         }
-        instance.isMounted = true
       } else {
         // 组件更新流程
       }
@@ -126,18 +151,73 @@ function baseCreateRenderer(options: RendererOptions): any {
     }
   }
 
+  const mountChildren: MountChildrenFn = (children, container) => {
+    for (let i = 0; i < children.length; i++) {
+      const child = (children[i] = normalizeVNode(children[i]))
+      patch(null, child, container)
+    }
+  }
+
+  const mountElement = (vnode: VNode, container: RendererElement) => {
+    let { type, props, shapeFlag, children } = vnode
+
+    let el = (vnode.el = hostCreateElement(type as string))
+
+    if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+      hostSetElementText(el, children as string)
+    } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+      mountChildren(children as VNodeArrayChildren, el)
+    }
+
+    // 处理属性
+    if (props) {
+      for (const key in props) {
+        hostPatchProp(el, key, null, props[key])
+      }
+    }
+
+    hostInsert(el, container)
+  }
+
+  const processElement = (
+    n1: VNode | null,
+    n2: VNode,
+    container: RendererElement
+  ) => {
+    if (n1 == null) {
+      mountElement(n2, container) // 初始化
+    } else {
+      // diff
+    }
+  }
+
+  const processText: ProcessTextOrCommentFn = (n1, n2, container) => {
+    if (n1 === null) {
+      // 文本的初始化
+      hostInsert(hostCreateText(n2.children as string), container)
+    }
+  }
+
   const patch: PatchFn = (n1, n2, container) => {
     if (n1 == n2) return
-    const { shapeFlag } = n2
-    if (shapeFlag & ShapeFlags.COMPONENT) {
-      processComponent(n1, n2, container)
+    const { shapeFlag, type } = n2
+
+    switch (type) {
+      case Text:
+        processText(n1, n2, container)
+      default:
+        if (shapeFlag & ShapeFlags.COMPONENT) {
+          processComponent(n1, n2, container)
+        } else if (shapeFlag & ShapeFlags.ELEMENT) {
+          processElement(n1, n2, container)
+        }
     }
   }
 
   const render: RootRenderFunction = (vnode, container) => {
     if (vnode == null) {
     } else {
-      patch(null, vnode!, container)
+      patch(null, vnode, container)
     }
   }
   return {

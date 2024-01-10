@@ -4,7 +4,7 @@ import {
 } from './ComponentPublicInstance'
 import { EmitFn, EmitsOptions, UnwrapSlotsType } from './componentEmits'
 import { InternalSlots, SlotsType } from './componentSlots'
-import { VNode, VNodeChild } from './vnode'
+import { VNode } from './vnode'
 import { initProps } from './componentProps'
 import { isFunction, isObject } from '@vue/shared'
 

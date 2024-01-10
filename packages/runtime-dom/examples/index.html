@@ -15,6 +15,7 @@
         const count = ref(initValue)
         const add = () => {
           count.value++
+          console.log(1, count.value)
         }
         return {
           count,
@@ -40,7 +41,16 @@
           }
         },
         render(proxy) {
-          return h('h1', { onClick: this.add }, 'hello runtime' + this.count)
+          return h(
+            'h1',
+            { onClick: this.add },
+            h(
+              'span',
+              { style: { color: 'red', marginRight: '10px' } },
+              'hello'
+            ),
+            'world runtime' + this.count.value
+          )
         },
       }
       let app = createApp(App, { title: 'title', a: 1 })

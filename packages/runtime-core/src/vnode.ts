@@ -1,8 +1,10 @@
-import { ShapeFlags, isObject, isString } from '@vue/shared'
+import { ShapeFlags, isArray, isObject, isString } from '@vue/shared'
 import { Component, ComponentInternalInstance, Data } from './component'
 import { RendererNode } from './renderer'
 
-type VnodeTypes = string | VNode | Component
+export const Text = Symbol.for('v-txt')
+
+type VnodeTypes = string | VNode | Component | typeof Text
 
 type VNodeProps = {
   key?: string | number | symbol
@@ -18,9 +20,9 @@ type VNodeChildAtom =
   | undefined
   | void
 
-type VNodeArrayChildren = Array<VNodeArrayChildren | VNodeChildAtom>
+export type VNodeArrayChildren = Array<VNodeArrayChildren | VNodeChildAtom>
 
-export type VNodeChild = VNodeChildAtom | VNodeArrayChildren
+type VNodeChild = VNodeChildAtom | VNodeArrayChildren
 
 type VNodeNormalizedChildren = string | VNodeArrayChildren | null
 
@@ -43,8 +45,8 @@ const normalizeKey = ({ key }: VNodeProps): VNode['key'] =>
   key != null ? key : null
 
 export const createVNode = (
-  type: Component,
-  props: Data | null,
+  type: VnodeTypes | Component,
+  props?: Data | null,
   children: unknown = null
 ): VNode => {
   const shapeFlag = isObject(type)
@@ -69,4 +71,11 @@ export const createVNode = (
       : ShapeFlags.ARRAY_CHILDREN
   }
   return vnode
+}
+
+export function normalizeVNode(child: VNodeChild): VNode {
+  if (isObject(child)) {
+    return child as VNode
+  }
+  return createVNode(Text, null, String(child))
 }

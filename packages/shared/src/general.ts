@@ -4,6 +4,8 @@ export const hasOwn = (
   key: string | symbol
 ): key is keyof typeof val => hasOwnProperty.call(val, key)
 
+export const isArray = Array.isArray
+
 export const isFunction = (value: unknown): value is Function => {
   return typeof value === 'function'
 }
