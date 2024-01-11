@@ -1,8 +1,15 @@
 import { ShapeFlags } from '@vue/shared'
 import { CreateAppFunction, createAppAPI } from './apiCreateApp'
-import { Text, VNode, VNodeArrayChildren, normalizeVNode } from './vnode'
+import {
+  Text,
+  VNode,
+  VNodeArrayChildren,
+  isSameVNodeType,
+  normalizeVNode,
+} from './vnode'
 import {
   ComponentInternalInstance,
+  Data,
   createComponentInstance,
   setupComponent,
 } from './component'
@@ -68,6 +75,8 @@ type SetupRenderEffectFn = (
   container: RendererElement
 ) => void
 
+type UnmountFn = (vnode: VNode) => void
+
 export function createRenderer<
   HostNode = RendererNode,
   HostElement = RendererElement
@@ -118,6 +127,9 @@ function baseCreateRenderer(options: RendererOptions): any {
         }
       } else {
         // 组件更新流程
+        const prevTree = instance.subTree
+        const nextTree = instance.render!.call(proxy, proxy)
+        patch(prevTree, nextTree, container)
       }
     }
     const effect = new ReactiveEffect(componentUpdateFn)
@@ -179,6 +191,32 @@ function baseCreateRenderer(options: RendererOptions): any {
     hostInsert(el, container)
   }
 
+  const patchProps = (el: RendererElement, oldProps: Data, newProps: Data) => {
+    if (oldProps === newProps) return
+
+    for (const key in newProps) {
+      const prev = oldProps[key]
+      const next = newProps[key]
+      if (prev !== next) {
+        hostPatchProp(el, key, prev, next)
+      }
+    }
+
+    for (const key in oldProps) {
+      if (!(key in newProps)) {
+        hostPatchProp(el, key, oldProps, newProps)
+      }
+    }
+  }
+
+  const patchElement = (n1: VNode, n2: VNode) => {
+    let el = (n2.el = n1.el!) // 先比较元素，元素一致就复用
+
+    const oldProps = n1.props || {}
+    const newProps = n2.props || {}
+    patchProps(el, oldProps, newProps)
+  }
+
   const processElement = (
     n1: VNode | null,
     n2: VNode,
@@ -187,7 +225,7 @@ function baseCreateRenderer(options: RendererOptions): any {
     if (n1 == null) {
       mountElement(n2, container) // 初始化
     } else {
-      // diff
+      patchElement(n1, n2) // diff
     }
   }
 
@@ -198,7 +236,17 @@ function baseCreateRenderer(options: RendererOptions): any {
     }
   }
 
+  const unmount: UnmountFn = vnode => {
+    hostRemove(vnode.el!)
+  }
+
   const patch: PatchFn = (n1, n2, container) => {
+    // 前后元素不一致 => 删除老的，换成新的元素
+    if (n1 && !isSameVNodeType(n1, n2)) {
+      unmount(n1)
+      n1 = null
+    }
+
     if (n1 == n2) return
     const { shapeFlag, type } = n2
 

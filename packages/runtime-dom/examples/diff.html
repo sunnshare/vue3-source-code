@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">123</div>
+    <script src="../dist/runtime-dom.global.js"></script>
+    <script>
+      let { createApp, h, ref } = VueRuntimeDom
+
+      function useCount(initValue) {
+        const count = ref(initValue)
+        const add = () => {
+          count.value++
+          console.log(1, count.value)
+        }
+        return {
+          count,
+          add,
+        }
+      }
+
+      let App = {
+        props: {},
+        setup() {
+          let flag = ref(true)
+          setTimeout(() => {
+            flag.value = !flag.value
+          }, 2000)
+          return {
+            flag,
+          }
+        },
+        render() {
+          return this.flag.value
+            ? h('div', { style: { color: 'red' } }, 'hello')
+            : h('div', { style: { color: 'green' } }, 'world')
+        },
+      }
+      let app = createApp(App, { title: 'title', a: 1 })
+      app.mount('#app')
+    </script>
+  </body>
+</html>
