@@ -87,3 +87,17 @@
   - 是属性就调用传入的 patchProp 方法进行处理
 
 - 最后将处理好的节点挂载到容器上
+
+## diff 算法
+
+- 元素不相同(type 和 key 都不相同) => 直接替换不用比较 ，元素相同 => 比较属性 => 比较子元素
+
+- 数组 -> 文本，unmountChildren(数组)，hostSetElementText(文本)
+
+- 数组 -> 空，unmountChildren(数组)
+
+- 文本 -> 空，hostSetElementText(空)
+
+- 文本 -> 数组，mountChildren(数组)
+
+- 数组 -> 数组 => 深层次 diff patchKeyedChildren

@@ -10,6 +10,7 @@ vue2 源码请看 https://github.com/sunnshare/vue-source-code/
 - [x] 实现计算属性
 - [x] 实现 ref
 - [x] render 函数实现
+- [x] 实现 diff 算法
 
 ### 其他笔记
 

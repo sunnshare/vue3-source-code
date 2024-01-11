@@ -77,6 +77,14 @@ type SetupRenderEffectFn = (
 
 type UnmountFn = (vnode: VNode) => void
 
+type PatchChildrenFn = (
+  n1: VNode | null,
+  n2: VNode,
+  container: RendererElement
+) => void
+
+type UnmountChildrenFn = (children: VNode[]) => void
+
 export function createRenderer<
   HostNode = RendererNode,
   HostElement = RendererElement
@@ -209,12 +217,57 @@ function baseCreateRenderer(options: RendererOptions): any {
     }
   }
 
+  const unmountChildren: UnmountChildrenFn = children => {
+    for (let i = 0; i < children.length; i++) {
+      unmount(children[i])
+    }
+  }
+
+  const patchKeyedChildren = (
+    c1: VNode[],
+    c2: VNodeArrayChildren,
+    container: RendererElement
+  ) => {}
+
+  const patchChildren: PatchChildrenFn = (n1, n2, container) => {
+    const c1 = n1 && n1.children
+    const c2 = n2.children
+    const preShapeFlag = n1?.shapeFlag || 0
+    const shapeFlag = n2.shapeFlag
+
+    if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+      if (preShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+        unmountChildren(c1 as VNode[])
+      }
+      if (c1 !== c2) {
+        hostSetElementText(container, c2 as string)
+      }
+    } else {
+      if (preShapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+        if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+          patchKeyedChildren(c1 as VNode[], c2 as VNode[], container) // 比对两个数组的差异
+        } else {
+          unmountChildren(c1 as VNode[])
+        }
+      } else {
+        if (preShapeFlag & ShapeFlags.TEXT_CHILDREN) {
+          hostSetElementText(container, '')
+        }
+        if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
+          mountChildren(c2 as VNode[], container)
+        }
+      }
+    }
+  }
+
   const patchElement = (n1: VNode, n2: VNode) => {
     let el = (n2.el = n1.el!) // 先比较元素，元素一致就复用
 
     const oldProps = n1.props || {}
     const newProps = n2.props || {}
     patchProps(el, oldProps, newProps)
+
+    patchChildren(n1, n2, el) // 比较子元素
   }
 
   const processElement = (
@@ -232,7 +285,7 @@ function baseCreateRenderer(options: RendererOptions): any {
   const processText: ProcessTextOrCommentFn = (n1, n2, container) => {
     if (n1 === null) {
       // 文本的初始化
-      hostInsert(hostCreateText(n2.children as string), container)
+      hostInsert((n2.el = hostCreateText(n2.children as string)), container)
     }
   }
 
