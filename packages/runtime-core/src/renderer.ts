@@ -55,7 +55,8 @@ type MountComponentFn = (
 type PatchFn = (
   n1: VNode | null, // null means this is a mount
   n2: VNode,
-  container: RendererElement
+  container: RendererElement,
+  anchor?: RendererNode | null
 ) => void
 
 type MountChildrenFn = (
@@ -178,7 +179,11 @@ function baseCreateRenderer(options: RendererOptions): any {
     }
   }
 
-  const mountElement = (vnode: VNode, container: RendererElement) => {
+  const mountElement = (
+    vnode: VNode,
+    container: RendererElement,
+    anchor: RendererNode | null
+  ) => {
     let { type, props, shapeFlag, children } = vnode
 
     let el = (vnode.el = hostCreateElement(type as string))
@@ -196,7 +201,7 @@ function baseCreateRenderer(options: RendererOptions): any {
       }
     }
 
-    hostInsert(el, container)
+    hostInsert(el, container, anchor)
   }
 
   const patchProps = (el: RendererElement, oldProps: Data, newProps: Data) => {
@@ -225,9 +230,79 @@ function baseCreateRenderer(options: RendererOptions): any {
 
   const patchKeyedChildren = (
     c1: VNode[],
-    c2: VNodeArrayChildren,
+    c2: VNode[],
     container: RendererElement
-  ) => {}
+  ) => {
+    let e1 = c1.length - 1
+    let e2 = c2.length - 1
+    let i = 0
+
+    // 1. sync from start
+    // (a b) c
+    // (a b) d e
+    while (i <= e1 && i < e2) {
+      const n1 = c1[i]
+      const n2 = c2[i]
+      if (isSameVNodeType(n1, n2)) {
+        patch(n1, n2, container)
+      } else {
+        break
+      }
+      i++
+    }
+
+    // 2. sync from end
+    // a (b c)
+    // d e (b c)
+    while (i <= e1 && i <= e2) {
+      const n1 = c1[e1]
+      const n2 = c2[e2]
+      if (isSameVNodeType(n1, n2)) {
+        patch(n1, n2, container)
+      } else {
+        break
+      }
+      e1--
+      e2--
+    }
+
+    // 3. common sequence + mount
+    // (a b)
+    // (a b) c
+    // i = 2, e1 = 1, e2 = 2
+    // (a b)
+    // c d (a b)
+    // i = 0, e1 = -1, e2 = 1
+    if (i > e1 && i <= e2) {
+      while (i <= e2) {
+        const nextPos = e2 + 1
+        const anchor = nextPos < c2.length ? c2[nextPos].el : null
+        patch(null, c2[i], container, anchor)
+        i++
+      }
+    }
+
+    // 4. common sequence + unmount
+    // (a b) c
+    // (a b)
+    // i = 2, e1 = 2, e2 = 1
+    // a d (b c)
+    // (b c)
+    // i = 0, e1 = 1, e2 = -1
+    else if (i > e2) {
+      while (i <= e1) {
+        unmount(c1[i])
+        i++
+      }
+    }
+
+    // 5. unknown sequence
+    // [i ... e1 + 1]: a b [c d e] f g
+    // [i ... e2 + 1]: a b [e d c h] f g
+    // i = 2, e1 = 4, e2 = 5
+    else {
+    }
+  }
 
   const patchChildren: PatchChildrenFn = (n1, n2, container) => {
     const c1 = n1 && n1.children
@@ -273,10 +348,11 @@ function baseCreateRenderer(options: RendererOptions): any {
   const processElement = (
     n1: VNode | null,
     n2: VNode,
-    container: RendererElement
+    container: RendererElement,
+    anchor: RendererNode | null
   ) => {
     if (n1 == null) {
-      mountElement(n2, container) // 初始化
+      mountElement(n2, container, anchor) // 初始化
     } else {
       patchElement(n1, n2) // diff
     }
@@ -293,7 +369,7 @@ function baseCreateRenderer(options: RendererOptions): any {
     hostRemove(vnode.el!)
   }
 
-  const patch: PatchFn = (n1, n2, container) => {
+  const patch: PatchFn = (n1, n2, container, anchor = null) => {
     // 前后元素不一致 => 删除老的，换成新的元素
     if (n1 && !isSameVNodeType(n1, n2)) {
       unmount(n1)
@@ -310,7 +386,7 @@ function baseCreateRenderer(options: RendererOptions): any {
         if (shapeFlag & ShapeFlags.COMPONENT) {
           processComponent(n1, n2, container)
         } else if (shapeFlag & ShapeFlags.ELEMENT) {
-          processElement(n1, n2, container)
+          processElement(n1, n2, container, anchor)
         }
     }
   }

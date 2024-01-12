@@ -36,8 +36,20 @@
         },
         render() {
           return this.flag.value
-            ? h('div', { style: { color: 'red' } }, 'hello')
-            : h('div', { style: { color: 'green' } }, 'world')
+            ? h('div', { style: { color: 'red' } }, [
+                // h('li', { key: 'a' }, 'a'),
+                h('li', { key: 'b' }, 'b'),
+                h('li', { key: 'c' }, 'c'),
+                h('li', { key: 'd' }, 'd'),
+                h('li', { key: 'e' }, 'e'),
+              ])
+            : h('div', { style: { color: 'green' } }, [
+                h('li', { key: 'a' }, 'a'),
+                h('li', { key: 'b' }, 'b'),
+                h('li', { key: 'c' }, 'c'),
+                h('li', { key: 'd' }, 'd'),
+                h('li', { key: 'e' }, 'e'),
+              ])
         },
       }
       let app = createApp(App, { title: 'title', a: 1 })
