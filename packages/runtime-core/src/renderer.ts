@@ -1,4 +1,4 @@
-import { ShapeFlags } from '@vue/shared'
+import { ShapeFlags, getSequence } from '@vue/shared'
 import { CreateAppFunction, createAppAPI } from './apiCreateApp'
 import {
   Text,
@@ -334,16 +334,23 @@ function baseCreateRenderer(options: RendererOptions): any {
       }
 
       // 5.3 move and mount
+      let increasingNewIndexSequence = getSequence(newIndexToOldIndexMap) // 得出一个不用移动的索引序列
+
+      let j = increasingNewIndexSequence.length - 1
       // looping backwards so that we can use last patched node as anchor
       for (i = toBePatched - 1; i >= 0; i--) {
         const nextIndex = s2 + i
         const nextChild = c2[nextIndex]
         const anchor = nextIndex + 1 < c2.length ? c2[nextIndex + 1].el : null
 
-        if (newIndexToOldIndexMap[i] == 0) {
+        if (newIndexToOldIndexMap[i] === 0) {
           patch(null, nextChild, container, anchor) // 新增节点变成真实节点再插入
         } else {
-          hostInsert(nextChild.el!, container, anchor)
+          if (j < 0 || i !== increasingNewIndexSequence[j]) {
+            hostInsert(nextChild.el!, container, anchor)
+          } else {
+            j-- // 当前 i 不需要移动
+          }
         }
       }
     }
