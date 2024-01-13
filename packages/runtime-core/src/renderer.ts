@@ -297,10 +297,55 @@ function baseCreateRenderer(options: RendererOptions): any {
     }
 
     // 5. unknown sequence
-    // [i ... e1 + 1]: a b [c d e] f g
+    // [i ... e1 + 1]: a b [c e d] f g
     // [i ... e2 + 1]: a b [e d c h] f g
     // i = 2, e1 = 4, e2 = 5
     else {
+      const s1 = i // prev starting index
+      const s2 = i // next starting index
+
+      // 5.1 build key:index map for newChildren
+      const keyToNewIndexMap: Map<string | number | symbol, number> = new Map()
+      for (i = s2; i <= e2; i++) {
+        const nextChild = c2[i]
+        if (nextChild.key != null) {
+          keyToNewIndexMap.set(nextChild.key, i)
+        }
+      }
+
+      // 5.2 loop through old children left to be patched and try to patch
+      const toBePatched = e2 - s2 + 1
+
+      const newIndexToOldIndexMap = new Array(toBePatched).fill(0)
+
+      for (let i = s1; i <= e1; i++) {
+        const prevChild = c1[i]
+
+        let newIndex
+        if (prevChild.key != null) {
+          newIndex = keyToNewIndexMap.get(prevChild.key)
+        }
+        if (newIndex == undefined) {
+          unmount(prevChild) // 新节点里面没有这个 key => 删除
+        } else {
+          newIndexToOldIndexMap[newIndex - s2] = i + 1 // 保证填入的值不为0
+          patch(prevChild, c2[newIndex], container) // 比较 key 相同的两个节点
+        }
+      }
+
+      // 5.3 move and mount
+      // looping backwards so that we can use last patched node as anchor
+      for (i = toBePatched - 1; i >= 0; i--) {
+        const nextIndex = s2 + i
+        const nextChild = c2[nextIndex]
+        const anchor = nextIndex + 1 < c2.length ? c2[nextIndex + 1].el : null
+
+        if (newIndexToOldIndexMap[i] == 0) {
+          patch(null, nextChild, container, anchor) // 新增节点变成真实节点再插入
+        } else {
+          hostInsert(nextChild.el!, container, anchor)
+        }
+      }
     }
   }
 
